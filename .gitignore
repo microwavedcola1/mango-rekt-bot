@@ -1,0 +1,5 @@
+node_modules
+rekt*log
+dist
+.env.prod
+.env
