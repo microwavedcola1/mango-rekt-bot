@@ -196,9 +196,19 @@ export async function processSignature(signature: string): Promise<string> {
       continue;
     }
 
-    const decodeData = bs58.decode((ix as PartiallyDecodedInstruction).data);
+    let decodeData = bs58.decode((ix as PartiallyDecodedInstruction).data);
     try {
-      let decodedInstruction = MangoInstructionLayout.decode(decodeData);
+      let decodedInstruction;
+      if (decodeData[0] === 12 && decodeData.length === 30) {
+        decodedInstruction = MangoInstructionLayout.decode(
+          Buffer.concat([decodeData, Buffer.from([0x01])], 31)
+        );
+      } else if (decodeData[0] === 12 && decodeData.length === 31) {
+        console.log(" -");
+        console.log(bs58.decode((ix as PartiallyDecodedInstruction).data));
+      } else {
+        decodedInstruction = MangoInstructionLayout.decode(decodeData);
+      }
 
       let instructionName = Object.keys(decodedInstruction)[0];
       const accounts = (ix as PartiallyDecodedInstruction).accounts.map(
@@ -243,12 +253,14 @@ export async function processSignature(signature: string): Promise<string> {
         combinedNotification = combinedNotification + msg + "\n";
       }
     } catch (e) {
-      // if (!(e instanceof RangeError) && !(e instanceof TypeError)) 
+      // if (!(e instanceof RangeError) && !(e instanceof TypeError))
       {
-          console.error(`https://explorer.solana.com/tx/${signature}`);        
-          console.error(`- instruction idx in transaction - ${idx}`)
-          console.error(`- PartiallyDecodedInstruction).data - ${(ix as PartiallyDecodedInstruction).data}`)
-          console.error(`- ${e}, ${e.stack}`);        
+        // console.error(`https://explorer.solana.com/tx/${signature}`);
+        // console.error(`- ${decodeData[0]}`)
+        // console.error(`- instruction idx in transaction - ${idx}`)
+        // console.error(`- PartiallyDecodedInstruction).data - ${(ix as PartiallyDecodedInstruction).data}`)
+        console.error(`- ${e}`);
+        // console.error(`- ${e}, ${e.stack}`);
       }
     }
   }
