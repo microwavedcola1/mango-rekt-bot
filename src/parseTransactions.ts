@@ -1,8 +1,11 @@
-import { IDS } from "@blockworks-foundation/mango-client";
+import { AssetType, I80F48, IDS } from "@blockworks-foundation/mango-client";
+import { Coder } from '@project-serum/anchor';
+import type BN from "bn.js";
 import { AssetValue, calculateEmojis } from "./emoji";
+import idl from './idl.json';
 
-
-const bs58 = require('bs58')
+// @ts-ignore
+const coder = new Coder(idl);
 
 /* tslint:disable */
 
@@ -35,12 +38,32 @@ var tokenIndexesMap = {
 
 var ids = IDS;
 
+export function parseEventsFromLogMessages(logMessages: string[]) {
+  const parsedEvents=[]
+  let idx = 0;
+  while (idx<logMessages.length-1) {
+    if (logMessages[idx] === "Program log: mango-log") {
+      try {
+        const evenLogMessage = logMessages[idx + 1].replace(
+          "Program log: ",
+          ""
+        );
+        const x = coder.events.decode(evenLogMessage);
+        parsedEvents.push(x)
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    idx = idx + 2;
+  }
+  return parsedEvents;
+}
+
 export function parseLiquidatePerpMarket(signature:string, logMessages:any, accounts:any, baseLotSizeMap:any):string {
 
     if (logMessages.includes('Program log: Account init_health above zero.')) {
         return undefined;
     }
-
     let mangoGroupPk = accounts[0]
     let liqee = accounts[4]
     let liqor = accounts[5]
@@ -54,23 +77,39 @@ export function parseLiquidatePerpMarket(signature:string, logMessages:any, acco
     let baseTransfer
     let quoteTransfer
     let bankruptcy
-    let startDetailsStr = 'Program log: liquidate_perp_market details: ';
-    for (let logMessage of logMessages) {
-        if (logMessage.startsWith(startDetailsStr)) {
-            let liquidationDetails = JSON.parse(logMessage.slice(startDetailsStr.length));
-            
-            let perpMarket = perpMarkets.find(e => e['marketIndex'] === liquidationDetails['market_index'])!
-            perpMarketName = perpMarket.name
-            let liabDecimals = perpMarket.baseDecimals;
-            let assetDecimals = perpMarket.quoteDecimals;            
-            liabSymbol = perpMarket.baseSymbol;
-            assetSymbol = quoteSymbol;
-            const baseLotSize = baseLotSizeMap[perpMarket.publicKey.toString()]
-            baseTransfer = (liquidationDetails['base_transfer'] * baseLotSize) / Math.pow(10, liabDecimals);
-            // TODO: quoteTransfer is -base_transfer * pmi.base_lot_size - but I don't really know what this means
-            quoteTransfer = (liquidationDetails['quote_transfer'] / baseLotSize) / Math.pow(10, liabDecimals);
-            bankruptcy = liquidationDetails['bankruptcy'];
-        }
+
+    const eventsLogMessages = parseEventsFromLogMessages(logMessages);
+    const filteredEventsLogMessages = eventsLogMessages.filter(
+      (event) => event.name === "LiquidatePerpMarketLog"
+    );
+    if (filteredEventsLogMessages.length === 0) {
+      return undefined;
+    } else {
+      const event: {
+        marketIndex: BN;
+        price: BN;
+        baseTransfer: BN;
+        quoteTransfer: BN;
+        bankruptcy: boolean;
+      } = filteredEventsLogMessages[0].data as any;
+
+      let perpMarket = perpMarkets.find(
+        (e) => e.marketIndex === event.marketIndex.toNumber()
+      )!;
+      perpMarketName = perpMarket.name;
+      let liabDecimals = perpMarket.baseDecimals;
+      liabSymbol = perpMarket.baseSymbol;
+      assetSymbol = quoteSymbol;
+      const baseLotSize = baseLotSizeMap[perpMarket.publicKey.toString()];
+      baseTransfer =
+        (new I80F48(event.baseTransfer).toNumber() * baseLotSize) /
+        Math.pow(10, liabDecimals);
+      // TODO: quoteTransfer is -base_transfer * pmi.base_lot_size - but I don't really know what this means
+      quoteTransfer =
+        new I80F48(event.quoteTransfer).toNumber() /
+        baseLotSize /
+        Math.pow(10, liabDecimals);
+      bankruptcy = event.bankruptcy;
     }
     
     const result = {
@@ -131,7 +170,7 @@ export interface LiquidatePerpMarketResult {
 
 
 export function parseLiquidateTokenAndPerp(signature: string, logMessages:any, accounts:any, baseLotSizeMap:any): string {
-
+  
     if (logMessages.includes('Program log: Account init_health above zero.')) {
         return undefined;
     }
@@ -155,54 +194,61 @@ export function parseLiquidateTokenAndPerp(signature: string, logMessages:any, a
     let assetPrice
     let liabTransfer
     let liabPrice
-    let startDetailsStr = 'Program log: liquidate_token_and_perp details: ';
-    for (let logMessage of logMessages) {
-        if (logMessage.startsWith(startDetailsStr)) {
-            let liquidationDetails = JSON.parse(logMessage.slice(startDetailsStr.length));
+    let assetDecimals
+    let liabDecimals
 
-            assetType = liquidationDetails['asset_type'];
-            let assetIndex = liquidationDetails['asset_index'];
+    const eventsLogMessages = parseEventsFromLogMessages(logMessages);
+    const filteredEventsLogMessages = eventsLogMessages.filter(
+      (event) => event.name === "LiquidateTokenAndPerpLog"
+    );
+    if (filteredEventsLogMessages.length === 0) {
+      return undefined;
+    } else {
+      const event: {
+        assetIndex: BN,
+        liabIndex: BN,
+        assetType: AssetType,
+        liabType: AssetType,
+        assetPrice: BN,
+        liabPrice: BN,
+        assetTransfer: BN,
+        liabTransfer: BN,
+        bankruptcy: boolean
+      } = filteredEventsLogMessages[0].data as any;
 
-            liabType = liquidationDetails['liab_type'];
-            let liabIndex = liquidationDetails['liab_index'];
+      if (assetType === 'Token') {
+        // asset is token and liab is perp
+        let assetTokenPk = (tokenIndexesMap as any)[mangoGroupPk][event.assetIndex.toNumber()];
+        let assetToken = tokens.find(e => e['mintKey'] === assetTokenPk)!;
+        assetSymbol = assetToken.symbol;
+        assetDecimals = assetToken.decimals;    
 
-            let assetDecimals;
-            let liabDecimals;
-            if (assetType === 'Token') {
-                // asset is token and liab is perp
-                let assetTokenPk = (tokenIndexesMap as any)[mangoGroupPk][assetIndex];
-                let assetToken = tokens.find(e => e['mintKey'] === assetTokenPk)!;
-                assetSymbol = assetToken.symbol;
-                assetDecimals = assetToken.decimals;    
+        let liabPerpMarket =  perpMarkets.find(e => event.assetIndex.toNumber() === event.liabIndex.toNumber())
+        // Liquidation can only occur on quote position on perp side
+        // So I'll set the asset symbol to the quote symbol (as that is what is transferred)
+        liabSymbol = quoteSymbol;
+        liabDecimals = liabPerpMarket!.quoteDecimals;
+        perpMarket = liabPerpMarket!.name;
+    } else {
+        // asset is perp and liab is token
+        let assetPerpMarket =  perpMarkets.find(e => e.marketIndex === event.assetIndex.toNumber())
+        // Liquidation can only occur on quote position on perp side
+        // So I'll set the asset symbol to the quote symbol (as that is what is transferred)
+        assetSymbol = quoteSymbol;
+        assetDecimals = assetPerpMarket!.quoteDecimals;
+        perpMarket = assetPerpMarket!.name;
 
-                let liabPerpMarket =  perpMarkets.find(e => e['marketIndex'] === liabIndex)
-                // Liquidation can only occur on quote position on perp side
-                // So I'll set the asset symbol to the quote symbol (as that is what is transferred)
-                liabSymbol = quoteSymbol;
-                liabDecimals = liabPerpMarket!.quoteDecimals;
-                perpMarket = liabPerpMarket!.name;
-            } else {
-                // asset is perp and liab is token
-                let assetPerpMarket =  perpMarkets.find(e => e['marketIndex'] === assetIndex)
-                // Liquidation can only occur on quote position on perp side
-                // So I'll set the asset symbol to the quote symbol (as that is what is transferred)
-                assetSymbol = quoteSymbol;
-                assetDecimals = assetPerpMarket!.quoteDecimals;
-                perpMarket = assetPerpMarket!.name;
+        let liabTokenPk = (tokenIndexesMap as any)[mangoGroupPk][event.liabIndex.toNumber()];
+        let liabToken = tokens.find(e => e.mintKey === liabTokenPk);
+        liabSymbol = liabToken!.symbol;
+        liabDecimals = liabToken!.decimals;
+    }
 
-                let liabTokenPk = (tokenIndexesMap as any)[mangoGroupPk][liabIndex];
-                let liabToken = tokens.find(e => e['mintKey'] === liabTokenPk);
-                liabSymbol = liabToken!.symbol;
-                liabDecimals = liabToken!.decimals;
-            }
+    assetTransfer = new I80F48(event.assetTransfer).toNumber() / Math.pow(10, assetDecimals);
+    assetPrice = new I80F48(event.assetPrice).toNumber() * Math.pow(10, assetDecimals - quoteDecimals);
 
-            assetTransfer = liquidationDetails['asset_transfer'] / Math.pow(10, assetDecimals);
-            assetPrice = liquidationDetails['asset_price'] * Math.pow(10, assetDecimals - quoteDecimals);
-
-            liabTransfer = liquidationDetails['actual_liab_transfer'] / Math.pow(10, liabDecimals);;
-            liabPrice = liquidationDetails['liab_price'] * Math.pow(10, liabDecimals - quoteDecimals);
-
-        }
+    liabTransfer = new I80F48(event.liabTransfer).toNumber() / Math.pow(10, liabDecimals);;
+    liabPrice = new I80F48(event.liabPrice).toNumber() * Math.pow(10, liabDecimals - quoteDecimals);
     }
 
     const result = {
@@ -301,19 +347,33 @@ export function parseLiquidateTokenAndToken(signature:string, logMessages: any, 
     let assetTransfer;
     let liabTransfer;
     let bankruptcy;
-    let startDetailsStr = 'Program log: liquidate_token_and_token details: ';
-    for (let logMessage of logMessages) {
-        if (logMessage.startsWith(startDetailsStr)) {
-            let liquidationDetails = JSON.parse(logMessage.slice(startDetailsStr.length));
-            
-            assetPrice = liquidationDetails['asset_price'] * Math.pow(10, assetToken.decimals - quoteDecimals);
-            liabPrice = liquidationDetails['liab_price'] * Math.pow(10, liabToken.decimals - quoteDecimals);
-            
-            assetTransfer = liquidationDetails['asset_transfer'] / Math.pow(10, assetToken.decimals);
-            liabTransfer = liquidationDetails['liab_transfer'] / Math.pow(10, liabToken.decimals);
-            
-            bankruptcy = liquidationDetails['bankruptcy'];
-        }
+
+    const eventsLogMessages = parseEventsFromLogMessages(logMessages);
+    const filteredEventsLogMessages = eventsLogMessages.filter(
+      (event) => event.name === "LiquidateTokenAndTokenLog"
+    );
+    if (filteredEventsLogMessages.length === 0) {
+      return undefined;
+    } else {
+      const event: {
+        assetTransfer: BN;
+        liabTransfer: BN;
+        assetPrice: BN;
+        liabPrice: BN;
+        bankruptcy: boolean;
+      } = filteredEventsLogMessages[0].data as any;
+      assetPrice =  new I80F48(event.assetPrice).toNumber() *
+        Math.pow(10, assetToken.decimals - quoteDecimals);
+      liabPrice =
+        new I80F48(event.liabPrice).toNumber() *
+        Math.pow(10, liabToken.decimals - quoteDecimals);
+      assetTransfer =
+        new I80F48(event.assetTransfer).toNumber() /
+        Math.pow(10, assetToken.decimals);
+      liabTransfer =
+        new I80F48(event.assetTransfer).toNumber() /
+        Math.pow(10, liabToken.decimals);
+      bankruptcy = event.bankruptcy;
     }
 
     const result = {

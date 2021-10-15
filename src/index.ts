@@ -107,7 +107,7 @@ async function notifier() {
       mangoGroupConfig.publicKey,
       lastSeenSignature ? { until: lastSeenSignature } : {}
     );
-    // // to find instructions which are rare, we would like to scan backwards
+    // to find instructions which are rare, we would like to scan backwards
     // signatures = await connection.getConfirmedSignaturesForAddress2(
     //   mangoGroupConfig.publicKey,
     //   lastSeenSignature ? { before: lastSeenSignature } : {},
@@ -124,7 +124,7 @@ async function notifier() {
   }
 
   lastSeenSignature = signatures[0].signature;
-  // // to find instructions which are rare, we would like to scan backwards
+  // to find instructions which are rare, we would like to scan backwards
   // lastSeenSignature = signatures[signatures.length - 1].signature;
 
   logger.info(`lastSeenSignature - ${lastSeenSignature}`);
@@ -146,7 +146,7 @@ async function notifier() {
           combinedNotification + notificationForSignature + "\n";
       }
     } catch (e) {
-      // swallow
+      console.error(e)
     }
   }
 
@@ -243,7 +243,12 @@ export async function processSignature(signature: string): Promise<string> {
         combinedNotification = combinedNotification + msg + "\n";
       }
     } catch (e) {
-      // console.error(e);
+      if (!(e instanceof RangeError) && !(e instanceof TypeError)) {
+        {
+          console.error(signature);
+        }
+        console.error(e);
+      }
     }
   }
   return combinedNotification;
