@@ -191,7 +191,7 @@ export async function processSignature(signature: string): Promise<string> {
   }
 
   let combinedNotification = "";
-  for (const ix of confirmedTransaction.transaction.message.instructions) {
+  for (const [idx,ix] of confirmedTransaction.transaction.message.instructions.entries()) {
     if (!(ix as PartiallyDecodedInstruction).data) {
       continue;
     }
@@ -243,11 +243,12 @@ export async function processSignature(signature: string): Promise<string> {
         combinedNotification = combinedNotification + msg + "\n";
       }
     } catch (e) {
-      if (!(e instanceof RangeError) && !(e instanceof TypeError)) {
-        {
-          console.error(signature);
-          console.error(e);
-        }        
+      // if (!(e instanceof RangeError) && !(e instanceof TypeError)) 
+      {
+          console.error(`https://explorer.solana.com/tx/${signature}`);        
+          console.error(`- instruction idx in transaction - ${idx}`)
+          console.error(`- PartiallyDecodedInstruction).data - ${(ix as PartiallyDecodedInstruction).data}`)
+          console.error(`- ${e}, ${e.stack}`);        
       }
     }
   }
