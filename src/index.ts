@@ -246,8 +246,8 @@ export async function processSignature(signature: string): Promise<string> {
       if (!(e instanceof RangeError) && !(e instanceof TypeError)) {
         {
           console.error(signature);
-        }
-        console.error(e);
+          console.error(e);
+        }        
       }
     }
   }
