@@ -84,6 +84,7 @@ export function parseLiquidatePerpMarket(
   let baseTransfer;
   let quoteTransfer;
   let bankruptcy;
+  let price;
 
   const eventsLogMessages = parseEventsFromLogMessages(logMessages);
   const filteredEventsLogMessages = eventsLogMessages.filter(
@@ -117,6 +118,7 @@ export function parseLiquidatePerpMarket(
       baseLotSize /
       Math.pow(10, liabDecimals);
     bankruptcy = event.bankruptcy;
+    price = new I80F48(event.price).toNumber();
   }
 
   const result = {
@@ -153,7 +155,7 @@ export function parseLiquidatePerpMarket(
   // USDC was chosen to be deposited into liqee since the perp quote positions are in USDC so borrows
   // are implicitly in USDC, and perp position was reduced.
 
-  if (result.liab_amount > 0.0001) {
+  if (result.asset_amount * price > 10) {
     return `Liquidated ${Math.abs(result.liab_amount).toFixed(4)} ${
       result.liab_symbol
     } on ${result.perp_market} ${
@@ -326,7 +328,7 @@ export function parseLiquidateTokenAndPerp(
   //
   // User has base position of 0 on perp market, hence we cant reduce his perp position further
 
-  if (result.asset_amount > 0.0001) {
+  if (result.asset_amount * result.asset_price > 10) {
     return `${calculateEmojis(
       result as AssetValue
     )}Liquidated ${result.asset_amount.toFixed(4)} ${result.asset_symbol} on ${
@@ -458,14 +460,14 @@ export function parseLiquidateTokenAndToken(
   // (can also be thought of as higest borrow) for USDC
   //
 
-  if (result.asset_amount > 0.0001) {
+  if (result.asset_amount * result.asset_price > 10) {
     return `${calculateEmojis(
       result as AssetValue
-    )}Liquidated ${result.asset_amount.toFixed(4)} ${
+    )}Liquidated ${result.liab_amount.toFixed(4)} ${
+      result.liab_symbol
+    } borrow with ${result.asset_amount.toFixed(4)} ${
       result.asset_symbol
-    } at a price of ${result.asset_price.toFixed(
-      4
-    )} USDC on SPOT market https://explorer.solana.com/tx/${signature} `;
+    }, https://explorer.solana.com/tx/${signature}`;
   }
   return "";
 }

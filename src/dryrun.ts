@@ -4,9 +4,6 @@ import { processSignature } from "./index";
 // processSignature(
 //   "5vQc41njwmfabUzmvC1yStueYM1biGGpUyUx3VUSkv8ptGHT6a92xVJNU2jPmrmcQG2VEdwpbBfx5pewdrFrjp8q"
 // );
-// processSignature(
-//   "3UV6iiBBjsLZAFpJBCxaveFby2hQ4NURcvWqcNNV3JL6s46hh1pPniGw9WLvFthtYsZWerC7NqNYLXEvegiNTowT"
-// );
 
 // // // LiquidatePerpMarket
 // // processSignature(
@@ -36,7 +33,13 @@ processSignature(
 
 // LiquidateTokenAndToken
 processSignature(
-  "2Y5Psqx3atporVRMbGLrdcNr95Qem3HHF88uWU8XAhrRNS4m7uXDZKckP6d4DbFcLHP6HrfNntk4pTptHsZwPted"
+  "tc1n66bQMpsPoyxm71QbkvhiXXCEe9xiHhN1Zs3AWPvYmfU2211gRLka2vNUHLZV9sEy8wosQYZuKh3CVpC3yQL"
+);
+processSignature(
+  "2a7W89buGFpbJGT6uKdbWJrUjFSb3pfqAEbnmTRw7qBpZpuBWkR4DXkaGnkeXLb8QtbM53dBPrSWD3fGhHbb217W"
+);
+processSignature(
+  "2fBqNxiREtSYwHeBAQSrZH6692TQLCapcUQ9i5RFQuhEFktsXP22CLHjrgFyWsugvqZG7Ta3BWwd9QgExv7jz8PB"
 );
 
 // LiquidateTokenAndPerp
