@@ -198,7 +198,7 @@ export async function processSignature(signature: string): Promise<string> {
 
     const decodeData = bs58.decode((ix as PartiallyDecodedInstruction).data);
     try {
-      let decodedInstruction = MangoInstructionLayout.decode(decodeData);
+      let decodedInstruction = MangoInstructionLayout.decode(decodeData, 0);
 
       let instructionName = Object.keys(decodedInstruction)[0];
       const accounts = (ix as PartiallyDecodedInstruction).accounts.map(
