@@ -417,7 +417,7 @@ export function parseLiquidateTokenAndToken(
       new I80F48(event.assetTransfer).toNumber() /
       Math.pow(10, assetToken.decimals);
     liabTransfer =
-      new I80F48(event.assetTransfer).toNumber() /
+      new I80F48(event.liabTransfer).toNumber() /
       Math.pow(10, liabToken.decimals);
     bankruptcy = event.bankruptcy;
   }
