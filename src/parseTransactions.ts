@@ -37,6 +37,8 @@ var tokenIndexesMap = {
 
 var ids = IDS;
 
+const minUSDValue = 100;
+
 export function parseEventsFromLogMessages(logMessages: string[]) {
   const parsedEvents = [];
   let idx = 0;
@@ -155,7 +157,7 @@ export function parseLiquidatePerpMarket(
   // USDC was chosen to be deposited into liqee since the perp quote positions are in USDC so borrows
   // are implicitly in USDC, and perp position was reduced.
 
-  if (result.asset_amount * price > 10) {
+  if (result.asset_amount * price > minUSDValue) {
     return `Liquidated ${Math.abs(result.liab_amount).toFixed(4)} ${
       result.liab_symbol
     } on ${result.perp_market} ${
@@ -328,7 +330,7 @@ export function parseLiquidateTokenAndPerp(
   //
   // User has base position of 0 on perp market, hence we cant reduce his perp position further
 
-  if (result.asset_amount * result.asset_price > 10) {
+  if (result.asset_amount * result.asset_price > minUSDValue) {
     return `${calculateEmojis(
       result as AssetValue
     )}Liquidated ${result.asset_amount.toFixed(4)} ${result.asset_symbol} on ${
@@ -460,7 +462,7 @@ export function parseLiquidateTokenAndToken(
   // (can also be thought of as higest borrow) for USDC
   //
 
-  if (result.asset_amount * result.asset_price > 10) {
+  if (result.asset_amount * result.asset_price > minUSDValue) {
     return `${calculateEmojis(
       result as AssetValue
     )}Liquidated ${result.liab_amount.toFixed(4)} ${
