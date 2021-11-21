@@ -107,18 +107,15 @@ export function parseLiquidatePerpMarket(
       (e) => e.marketIndex === event.marketIndex.toNumber()
     )!;
     perpMarketName = perpMarket.name;
-    let liabDecimals = perpMarket.baseDecimals;
     liabSymbol = perpMarket.baseSymbol;
     assetSymbol = quoteSymbol;
     const baseLotSize = baseLotSizeMap[perpMarket.publicKey.toString()];
     baseTransfer =
-      (new I80F48(event.baseTransfer).toNumber() * baseLotSize) /
-      Math.pow(10, liabDecimals);
-    // TODO: quoteTransfer is -base_transfer * pmi.base_lot_size - but I don't really know what this means
+      (event.baseTransfer.toNumber() * baseLotSize) /
+      Math.pow(10, perpMarket.baseDecimals);
     quoteTransfer =
       new I80F48(event.quoteTransfer).toNumber() /
-      baseLotSize /
-      Math.pow(10, liabDecimals);
+      Math.pow(10, perpMarket.quoteDecimals);
     bankruptcy = event.bankruptcy;
     price = new I80F48(event.price).toNumber();
   }
