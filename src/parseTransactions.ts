@@ -3,6 +3,7 @@ import { Coder } from "@project-serum/anchor";
 import type BN from "bn.js";
 import { AssetValue, calculateEmojis } from "./emoji";
 import idl from "./idl.json";
+import { logger } from "./utils";
 
 // @ts-ignore
 const coder = new Coder(idl);
@@ -60,6 +61,7 @@ export function parseEventsFromLogMessages(logMessages: string[]) {
   return parsedEvents;
 }
 
+// transfers quote and base position from liqee to liqor
 export function parseLiquidatePerpMarket(
   signature: string,
   logMessages: any,
@@ -117,7 +119,9 @@ export function parseLiquidatePerpMarket(
       new I80F48(event.quoteTransfer).toNumber() /
       Math.pow(10, perpMarket.quoteDecimals);
     bankruptcy = event.bankruptcy;
-    price = new I80F48(event.price).toNumber();
+    price =
+      new I80F48(event.price).toNumber() *
+      Math.pow(10, perpMarket.baseDecimals - perpMarket.quoteDecimals);
   }
 
   const result = {
@@ -154,6 +158,20 @@ export function parseLiquidatePerpMarket(
   // USDC was chosen to be deposited into liqee since the perp quote positions are in USDC so borrows
   // are implicitly in USDC, and perp position was reduced.
 
+  // NEW style message, only log to console for debugging for now
+  // observe for few days and then use in prod for tweet'ing
+  if (result.asset_amount * price > minUSDValue) {
+    const newStyleMsg = `Liquidated ${
+      result.liab_amount > 0 ? "LONG" : "SHORT"
+    } of ${Math.abs(result.liab_amount).toFixed(4)} ${result.liab_symbol} on ${
+      result.perp_market
+    } (total value: ${Math.abs(result.liab_amount * price).toFixed(
+      4
+    )}$), https://explorer.solana.com/tx/${signature}`;
+    logger.info(newStyleMsg);
+  }
+
+  // OLD style message
   if (result.asset_amount * price > minUSDValue) {
     return `Liquidated ${Math.abs(result.liab_amount).toFixed(4)} ${
       result.liab_symbol
@@ -161,6 +179,7 @@ export function parseLiquidatePerpMarket(
       result.liab_amount > 0 ? "LONG" : "SHORT"
     }, https://explorer.solana.com/tx/${signature}`;
   }
+
   return "";
 }
 export interface LiquidatePerpMarketResult {
@@ -175,6 +194,7 @@ export interface LiquidatePerpMarketResult {
   mango_group: string;
 }
 
+// transfer asset to liqor and liab to liqee
 export function parseLiquidateTokenAndPerp(
   signature: string,
   logMessages: any,
