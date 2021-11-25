@@ -3,6 +3,7 @@ import { Coder } from "@project-serum/anchor";
 import type BN from "bn.js";
 import { AssetValue, calculateEmojis } from "./emoji";
 import idl from "./idl.json";
+import { logger } from "./utils";
 
 // @ts-ignore
 const coder = new Coder(idl);
@@ -157,24 +158,28 @@ export function parseLiquidatePerpMarket(
   // USDC was chosen to be deposited into liqee since the perp quote positions are in USDC so borrows
   // are implicitly in USDC, and perp position was reduced.
 
-  // OLD style message
-  // if (result.asset_amount * price > minUSDValue) {
-  //   return `Liquidated ${Math.abs(result.liab_amount).toFixed(4)} ${
-  //     result.liab_symbol
-  //   } on ${result.perp_market} ${
-  //     result.liab_amount > 0 ? "LONG" : "SHORT"
-  //   }, https://explorer.solana.com/tx/${signature}`;
-  // }
-  // NEW style message
+  // NEW style message, only log to console for debugging for now
+  // observe for few days and then use in prod for tweet'ing
   if (result.asset_amount * price > minUSDValue) {
-    return `Liquidated ${
+    const newStyleMsg = `Liquidated ${
       result.liab_amount > 0 ? "LONG" : "SHORT"
     } of ${Math.abs(result.liab_amount).toFixed(4)} ${result.liab_symbol} on ${
       result.perp_market
     } (total value: ${Math.abs(result.liab_amount * price).toFixed(
       4
     )}$), https://explorer.solana.com/tx/${signature}`;
+    logger.info(newStyleMsg);
   }
+
+  // OLD style message
+  if (result.asset_amount * price > minUSDValue) {
+    return `Liquidated ${Math.abs(result.liab_amount).toFixed(4)} ${
+      result.liab_symbol
+    } on ${result.perp_market} ${
+      result.liab_amount > 0 ? "LONG" : "SHORT"
+    }, https://explorer.solana.com/tx/${signature}`;
+  }
+
   return "";
 }
 export interface LiquidatePerpMarketResult {
