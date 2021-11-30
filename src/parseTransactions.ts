@@ -112,6 +112,11 @@ export function parseLiquidatePerpMarket(
     liabSymbol = perpMarket.baseSymbol;
     assetSymbol = quoteSymbol;
     const baseLotSize = baseLotSizeMap[perpMarket.publicKey.toString()];
+
+    if (baseLotSize === 0) {
+      return undefined;
+    }
+
     baseTransfer =
       (event.baseTransfer.toNumber() * baseLotSize) /
       Math.pow(10, perpMarket.baseDecimals);
