@@ -11,7 +11,7 @@
   "author": "microwavedcola1",
   "license": "MIT",
   "dependencies": {
-    "@blockworks-foundation/mango-client": "^3.2.4",
+    "@blockworks-foundation/mango-client": "^3.2.9",
     "@types/node-fetch": "^2.5.0",
     "@types/pino": "^6.3.11",
     "axios": "^0.22.0",
