@@ -61,11 +61,11 @@ async function updateMangoBaseLots() {
     console.error(e);
   }
 
-  mangoGroupConfig.perpMarkets.forEach((perpMarketConfig, index) => {
+  mangoGroupConfig.perpMarkets.forEach((perpMarketConfig) => {
     mangoGroup
       .loadPerpMarket(
         connection,
-        index,
+        perpMarketConfig.marketIndex,
         perpMarketConfig.baseDecimals,
         perpMarketConfig.quoteDecimals
       )
@@ -247,7 +247,7 @@ export async function processSignature(signature: string): Promise<string> {
         {
           console.error(signature);
           console.error(e);
-        }        
+        }
       }
     }
   }
