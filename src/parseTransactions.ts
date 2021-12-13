@@ -1,7 +1,6 @@
 import { AssetType, I80F48, IDS } from "@blockworks-foundation/mango-client";
 import { Coder } from "@project-serum/anchor";
 import type BN from "bn.js";
-import { AssetValue, calculateEmojis } from "./emoji";
 import idl from "./idl.json";
 import { logger } from "./utils";
 
@@ -352,11 +351,9 @@ export function parseLiquidateTokenAndPerp(
   // User has base position of 0 on perp market, hence we cant reduce his perp position further
 
   if (result.asset_amount * result.asset_price > minUSDValue) {
-    return `${calculateEmojis(
-      result as AssetValue
-    )}Liquidated ${result.asset_amount.toFixed(4)} ${result.asset_symbol} on ${
-      result.perp_market
-    } ${
+    return `Liquidated ${result.asset_amount.toFixed(4)} ${
+      result.asset_symbol
+    } on ${result.perp_market} ${
       result.liab_amount > 0 ? "LONG" : "SHORT"
     }, https://explorer.solana.com/tx/${signature}`;
   }
@@ -484,9 +481,7 @@ export function parseLiquidateTokenAndToken(
   //
 
   if (result.asset_amount * result.asset_price > minUSDValue) {
-    return `${calculateEmojis(
-      result as AssetValue
-    )}Liquidated ${result.liab_amount.toFixed(4)} ${
+    return `Liquidated ${result.liab_amount.toFixed(4)} ${
       result.liab_symbol
     } borrow with ${result.asset_amount.toFixed(4)} ${
       result.asset_symbol
