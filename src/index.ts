@@ -261,6 +261,6 @@ setInterval(updateMangoBaseLots, dayInSeconds * 1000);
 ////////////////
 // kick-off
 
-const twoMinutesSeconds = 2 * 60;
+const twoMinutesSeconds = 1 * 60;
 notifierErrorWrapper();
 setInterval(notifierErrorWrapper, twoMinutesSeconds * 1000);
