@@ -103,6 +103,7 @@ async function notifier() {
 
   let signatures: Array<ConfirmedSignatureInfo>;
   try {
+    // todo: change to a combination of last seen slot + before
     signatures = await connection.getConfirmedSignaturesForAddress2(
       mangoGroupConfig.publicKey,
       lastSeenSignature ? { until: lastSeenSignature } : {}
@@ -261,6 +262,6 @@ setInterval(updateMangoBaseLots, dayInSeconds * 1000);
 ////////////////
 // kick-off
 
-const oneMinutesSeconds = 1 * 60;
+const thirtySeconds = 1 * 30;
 notifierErrorWrapper();
-setInterval(notifierErrorWrapper, oneMinutesSeconds * 1000);
+setInterval(notifierErrorWrapper, thirtySeconds * 1000);
