@@ -104,6 +104,7 @@ async function notifier() {
   let signatures: Array<ConfirmedSignatureInfo>;
   try {
     // todo: change to a combination of last seen slot + before
+    // https://github.com/blockworks-foundation/mango-transaction-scraper-v3/blob/master/src/signatures.ts#L33
     signatures = await connection.getConfirmedSignaturesForAddress2(
       mangoGroupConfig.publicKey,
       lastSeenSignature ? { until: lastSeenSignature } : {}
