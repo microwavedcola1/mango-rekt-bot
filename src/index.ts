@@ -28,7 +28,8 @@ const mangoGroupConfig = Config.ids().groups.find(
   (group) => group.name == "mainnet.1"
 );
 const connection = new Connection(
-  process.env.CLUSTER_URL,
+  process.env.CLUSTER_URL ||
+    Config.ids().cluster_urls[mangoGroupConfig.cluster],
   "confirmed" as Commitment
 );
 

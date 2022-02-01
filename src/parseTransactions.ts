@@ -22,6 +22,11 @@ var tokenIndexesMap = {
     5: "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt",
     6: "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
     7: "8HGyAAB1yoM1ttS7pXjHMa3dukTFGQggnFFH3hJZgzQh",
+    8: "AGFEad2et2ZJif9jaGpdMixQqvW5i81aBdvKe7PHNfz3",
+    10: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    11: "9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa",
+    12: "KgV1GvrHQmRBY8sHQQeUKwTm2r2h8t4C8qt12Cw1HVE",
+    13: "F6v4wfAdJB8D8p77bMXZgYt8TDKsYxLYxH5AFhUkYx9W",
     15: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   },
   "4yJ2Vx3kZnmHTNCrHzdoj5nCwriF2kVhfKNvqC6gU8tr": {
@@ -139,7 +144,6 @@ export function parseLiquidatePerpMarket(
     bankruptcy: bankruptcy,
     mango_group: mangoGroupPk,
   } as LiquidatePerpMarketResult;
-
   // logger.info(JSON.stringify(result, null, '\t'));
 
   // (LiquidatePerpMarket) Liquidated SHORT on SOL-PERP: 0.0000146,
@@ -173,14 +177,17 @@ export function parseLiquidatePerpMarket(
   }
 
   // NEW style message
-  if (result.asset_amount * price > minUSDValue) {
-    return `Liquidated ${
-      result.liab_amount > 0 ? "LONG" : "SHORT"
-    } of ${Math.abs(result.liab_amount).toFixed(4)} ${result.liab_symbol} on ${
-      result.perp_market
-    } (total value: ${Math.abs(result.liab_amount * price).toFixed(
-      4
-    )}$), https://explorer.solana.com/tx/${signature}`;
+  if (Math.abs(result.liab_amount * price) > minUSDValue) {
+    return `Liquidated ${result.liab_amount > 0 ? "LONG" : "SHORT"} ${Math.abs(
+      result.liab_amount
+    ).toLocaleString(undefined, {
+      maximumSignificantDigits: 5,
+    })} ${result.perp_market} ($${Math.abs(result.asset_amount).toLocaleString(
+      undefined,
+      {
+        maximumFractionDigits: 2,
+      }
+    )}): https://explorer.solana.com/tx/${signature}`;
   }
 
   return "";
