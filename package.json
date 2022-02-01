@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node ./src/index.ts",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "notifier": "ts-node ./src/index.ts"
+    "notifier": "ts-node ./src/index.ts",
+    "dryrun": "ts-node ./src/dryrun.ts"
   },
   "author": "microwavedcola1",
   "license": "MIT",

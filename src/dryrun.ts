@@ -40,6 +40,10 @@ import { sleep } from "@blockworks-foundation/mango-client";
 //   "54Hc4JT6k5JHWHDzwppxPR7X3nPx6XSKhGaX3oNs2E6h8KP9AvxMHiUPw9wk26dD2FpijvCpLq4WpvXsADKmqqFU"
 // );
 // sleep(1000);
+// processSignature(
+//   "3myygdKjassTZAPDQQzhJHdhAUZwbfamPWf12ZrydgqSCJmQ5cGS1zehDDKao22mgaNkrojn4gADRyQ2dUZdKEG3"
+// );
+// sleep(1000);
 
 // LiquidateTokenAndToken
 // processSignature(
@@ -62,6 +66,5 @@ import { sleep } from "@blockworks-foundation/mango-client";
 //   "5sokdtBiV5JtETLg3Kpc3qStQbzMD2HAYMQ9TEo5bAFroVNoD85dV26F2Bxmihbrc5QS4tqXcaPwUzwFVvSrW1oe"
 // );
 
-
 /// christian
-processSignature("4ZB4oLgvYXnwri3HWDUuaTREa2jfxt6jFjnYKUeRQvoChtEs7fmuw23VB1uCtrJBRhg4DQZZ9DbKoDhNqYwSZ9XB");
+// processSignature("4ZB4oLgvYXnwri3HWDUuaTREa2jfxt6jFjnYKUeRQvoChtEs7fmuw23VB1uCtrJBRhg4DQZZ9DbKoDhNqYwSZ9XB");
