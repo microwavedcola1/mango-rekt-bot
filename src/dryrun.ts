@@ -4,9 +4,9 @@ import { sleep } from "@blockworks-foundation/mango-client";
 /// new anchor style logging examples
 
 // LiquidatePerpMarket
-// processSignature(
-//   "5qEhZo7n1gtwkW5Sigjb6e68pSJ3jVjqQ7NXi7jyaNrR458MF2U9i2tPVSmig46mRPEQu1WNM9PLTJigG8ayAy76"
-// );
+processSignature(
+  "5qEhZo7n1gtwkW5Sigjb6e68pSJ3jVjqQ7NXi7jyaNrR458MF2U9i2tPVSmig46mRPEQu1WNM9PLTJigG8ayAy76"
+);
 // sleep(1000);
 // processSignature(
 //   "3129avKVeJBWBrsnB19JpBZcECyJfjmNkEe9vH6KYuDab7aEwqkiQA4xpf3qHxrBnhkNJhhLKiSyTs73agdQ5mTb"
@@ -46,9 +46,9 @@ import { sleep } from "@blockworks-foundation/mango-client";
 // sleep(1000);
 
 // LiquidateTokenAndToken
-// processSignature(
-//   "tc1n66bQMpsPoyxm71QbkvhiXXCEe9xiHhN1Zs3AWPvYmfU2211gRLka2vNUHLZV9sEy8wosQYZuKh3CVpC3yQL"
-// );
+processSignature(
+  "tc1n66bQMpsPoyxm71QbkvhiXXCEe9xiHhN1Zs3AWPvYmfU2211gRLka2vNUHLZV9sEy8wosQYZuKh3CVpC3yQL"
+);
 // processSignature(
 //   "2a7W89buGFpbJGT6uKdbWJrUjFSb3pfqAEbnmTRw7qBpZpuBWkR4DXkaGnkeXLb8QtbM53dBPrSWD3fGhHbb217W"
 // );
@@ -57,9 +57,9 @@ import { sleep } from "@blockworks-foundation/mango-client";
 // );
 
 // LiquidateTokenAndPerp
-// processSignature(
-//   "2WYkCZnzxkVcpFgVEBhUpnRYyBNZNHmx8oEpL59UL8KbL7jPftRvaDmjtG7uBfLnANWghsAuuSbQWP9JuYcPCXcg"
-// );
+processSignature(
+  "2WYkCZnzxkVcpFgVEBhUpnRYyBNZNHmx8oEpL59UL8KbL7jPftRvaDmjtG7uBfLnANWghsAuuSbQWP9JuYcPCXcg"
+);
 
 /////// rekt from discord
 // processSignature(

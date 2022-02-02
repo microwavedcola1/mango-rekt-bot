@@ -172,7 +172,7 @@ export function parseLiquidatePerpMarket(
       4
     )} ${result.liab_symbol} on ${result.perp_market} ${
       result.liab_amount > 0 ? "LONG" : "SHORT"
-    }, https://explorer.solana.com/tx/${signature}`;
+    }, https://trade.mango.markets/account?pubkey=${liqee}`;
     logger.info(oldStyleMsg);
   }
 
@@ -187,7 +187,7 @@ export function parseLiquidatePerpMarket(
       {
         maximumFractionDigits: 2,
       }
-    )}): https://explorer.solana.com/tx/${signature}`;
+    )}), https://trade.mango.markets/account?pubkey=${liqee}`;
   }
 
   return "";
@@ -362,7 +362,7 @@ export function parseLiquidateTokenAndPerp(
       result.asset_symbol
     } on ${result.perp_market} ${
       result.liab_amount > 0 ? "LONG" : "SHORT"
-    }, https://explorer.solana.com/tx/${signature}`;
+    }, https://trade.mango.markets/account?pubkey=${liqee}`;
   }
   return "";
 }
@@ -492,7 +492,7 @@ export function parseLiquidateTokenAndToken(
       result.liab_symbol
     } borrow with ${result.asset_amount.toFixed(4)} ${
       result.asset_symbol
-    }, https://explorer.solana.com/tx/${signature}`;
+    }, https://trade.mango.markets/account?pubkey=${liqee}`;
   }
   return "";
 }
