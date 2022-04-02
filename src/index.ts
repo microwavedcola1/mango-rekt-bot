@@ -246,7 +246,7 @@ export async function processSignature(signature: string): Promise<string> {
         combinedNotification = combinedNotification + msg + "\n";
       }
     } catch (e) {
-      if (!(e instanceof RangeError) && !(e instanceof TypeError)) {
+      if (!(e instanceof RangeError)) {
         {
           console.error(signature);
           console.error(e);
