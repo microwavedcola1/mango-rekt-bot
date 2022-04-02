@@ -13,9 +13,11 @@
   "license": "MIT",
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.2.9",
+    "@types/bn.js": "^5.1.0",
     "@types/node-fetch": "^2.5.0",
     "@types/pino": "^6.3.11",
     "axios": "^0.22.0",
+    "bn.js": "^5.2.0",
     "dotenv": "^10.0.0",
     "lodash": "^4.17.21",
     "node-fetch": "2.6.1",

@@ -1,11 +1,11 @@
 import { AssetType, I80F48, IDS } from "@blockworks-foundation/mango-client";
-import { Coder } from "@project-serum/anchor";
+import * as anchor from "@project-serum/anchor";
 import type BN from "bn.js";
 import idl from "./idl.json";
 import { logger } from "./utils";
 
 // @ts-ignore
-const coder = new Coder(idl);
+const coder = new anchor.BorshCoder(idl);
 
 /* tslint:disable */
 
