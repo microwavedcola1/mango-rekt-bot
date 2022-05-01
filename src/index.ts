@@ -195,6 +195,13 @@ export async function processSignature(signature: string): Promise<string> {
 
   let combinedNotification = "";
   for (const ix of confirmedTransaction.transaction.message.instructions) {
+    // skip programs which are not mango
+    if (
+      ix.programId.toBase58() !== "mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68"
+    ) {
+      continue;
+    }
+
     if (!(ix as PartiallyDecodedInstruction).data) {
       continue;
     }
