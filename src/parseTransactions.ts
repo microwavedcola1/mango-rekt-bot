@@ -48,10 +48,13 @@ export function parseEventsFromLogMessages(logMessages: string[]) {
   const parsedEvents = [];
   let idx = 0;
   while (idx < logMessages.length - 1) {
-    if (logMessages[idx] === "Program log: mango-log") {
+    if (
+      logMessages[idx] === "Program log: mango-log" &&
+      logMessages[idx + 1].includes("Program data")
+    ) {
       try {
         const evenLogMessage = logMessages[idx + 1].replace(
-          "Program log: ",
+          "Program data: ",
           ""
         );
         const x = coder.events.decode(evenLogMessage);
