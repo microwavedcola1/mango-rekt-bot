@@ -267,7 +267,7 @@ export function parseLiquidateTokenAndPerp(
       bankruptcy: boolean;
     } = filteredEventsLogMessages[0].data as any;
 
-    if (assetType === AssetType.Token) {
+    if (event.assetType === AssetType.Token) {
       // asset is token and liab is perp
       let assetTokenPk = (tokenIndexesMap as any)[mangoGroupPk][
         event.assetIndex.toNumber()
@@ -277,7 +277,7 @@ export function parseLiquidateTokenAndPerp(
       assetDecimals = assetToken.decimals;
 
       let liabPerpMarket = perpMarkets.find(
-        (e) => event.assetIndex.toNumber() === event.liabIndex.toNumber()
+        (perpMarket) => perpMarket.marketIndex === event.liabIndex.toNumber()
       );
       // Liquidation can only occur on quote position on perp side
       // So I'll set the asset symbol to the quote symbol (as that is what is transferred)
