@@ -267,7 +267,7 @@ export function parseLiquidateTokenAndPerp(
       bankruptcy: boolean;
     } = filteredEventsLogMessages[0].data as any;
 
-    if (assetType === "Token") {
+    if (assetType === AssetType.Token) {
       // asset is token and liab is perp
       let assetTokenPk = (tokenIndexesMap as any)[mangoGroupPk][
         event.assetIndex.toNumber()
