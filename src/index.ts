@@ -159,9 +159,9 @@ async function notifier() {
     const expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
     const regex = new RegExp(expression);
 
-    const urls = combinedNotification.match(regex);
+    const urls = [...new Set(combinedNotification.match(regex))];
     for (const url of urls) {
-      combinedNotification = combinedNotification.replace(url, `<${url}>`)
+      combinedNotification = combinedNotification.replaceAll(url, `<${url}>`)
     }
 
     axios.post(process.env.WEBHOOK_URL, { content: combinedNotification });
